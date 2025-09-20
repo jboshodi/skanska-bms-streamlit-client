@@ -3,12 +3,14 @@ import streamlit as st
 import json
 import pandas as pd
 from PIL import Image, ImageOps, ImageDraw
+import re
 
 # Streamlit page configuration
-st.set_page_config(page_title="Co. Portfolio Creator", page_icon=":robot_face:", layout="wide")
+st.set_page_config(page_title="Insights Generator", page_icon=":robot_face:", layout="wide")
 
 # Function to crop image into a circle
 def crop_to_circle(image):
+    
     mask = Image.new('L', image.size, 0)
     mask_draw = ImageDraw.Draw(mask)
     mask_draw.ellipse((0, 0) + image.size, fill=255)
@@ -17,24 +19,35 @@ def crop_to_circle(image):
     return result
 
 # Title
-st.title("Co. Portfolio Creator")
+st.title("Indoor Air Quality Insights Generator")
+st.image("intellekt.png", width=1500)
 
 # Display a text box for input
 prompt = st.text_input("Please enter your query?", max_chars=2000)
 prompt = prompt.strip()
 
 # Display a primary button for submission
-submit_button = st.button("Submit", type="primary")
+submit_button = st.button("Submit Question")
 
 # Display a button to end the session
-end_session_button = st.button("End Session")
+end_session_button = st.button("End The Session")
 
 # Sidebar for user input
-st.sidebar.title("Trace Data")
+#st.sidebar.title("Trace Data")
 
 # Session State Management
 if 'history' not in st.session_state:
     st.session_state['history'] = []
+
+def contains_html(text):
+    # Regular expression pattern to match HTML tags
+    pattern = r'<[^>]+>'
+    
+    # Search for the pattern in the text
+    if re.search(pattern, text):
+        return True
+    else:
+        return False
 
 # Function to parse and format response
 def format_response(response_body):
@@ -78,7 +91,7 @@ if submit_button and prompt:
         the_response = "Apologies, but an error occurred. Please rerun the application" 
 
     # Use trace_data and formatted_response as needed
-    st.sidebar.text_area("", value=all_data, height=300)
+    #st.sidebar.text_area("", value=all_data, height=300)
     st.session_state['history'].append({"question": prompt, "answer": the_response})
     st.session_state['trace_data'] = the_response
   
@@ -97,37 +110,43 @@ if end_session_button:
 st.write("## Conversation History")
 
 # Load images outside the loop to optimize performance
-human_image = Image.open('/home/ubuntu/app/streamlit_app/human_face.png')
-robot_image = Image.open('/home/ubuntu/app/streamlit_app/robot_face.jpg')
+human_image = Image.open('human.png')
+robot_image = Image.open('Humanoid.png')
 circular_human_image = crop_to_circle(human_image)
 circular_robot_image = crop_to_circle(robot_image)
 
-for index, chat in enumerate(reversed(st.session_state['history'])):
+for index, chat in enumerate(st.session_state['history']):
     # Creating columns for Question
-    col1_q, col2_q = st.columns([2, 10])
+    col1_q, col2_q = st.columns([1, 8])
     with col1_q:
-        st.image(circular_human_image, width=125)
+        st.image(circular_human_image, width=70)
     with col2_q:
         # Generate a unique key for each question text area
-        st.text_area("Q:", value=chat["question"], height=68, key=f"question_{index}", disabled=True)
+        st.text_area("Q:", value=chat["question"], height=10, key=f"question_{index}", disabled=True)
 
     # Creating columns for Answer
-    col1_a, col2_a = st.columns([2, 10])
+    col1_a, col2_a = st.columns([1, 8])
     if isinstance(chat["answer"], pd.DataFrame):
         with col1_a:
-            st.image(circular_robot_image, width=100)
+            st.image(circular_robot_image, width=70)
         with col2_a:
             # Generate a unique key for each answer dataframe
             st.dataframe(chat["answer"], key=f"answer_df_{index}")
     else:
         with col1_a:
-            st.image(circular_robot_image, width=150)
+            st.image(circular_robot_image, width=70)
         with col2_a:
             # Generate a unique key for each answer text area
-            st.text_area("A:", value=chat["answer"], height=100, key=f"answer_{index}")
+            str_chat = chat["answer"]
+            if contains_html(str_chat):
+                st.html(str_chat)
+            else:
+                #str_display = st.html(str_chat)
+                st.text_area("A:", value= chat["answer"], height=50, key=f"answer_{index}")
+           
 
 # Example Prompts Section
-st.write("## Test Knowledge Base Prompts")
+#st.write("## Test Knowledge Base Prompts")
 
 # Creating a list of prompts for the Knowledge Base section
 knowledge_base_prompts = [
@@ -138,10 +157,10 @@ knowledge_base_prompts = [
 ]
 
 # Displaying the Knowledge Base prompts as a table
-st.table(knowledge_base_prompts)
+#st.table(knowledge_base_prompts)
 
 # Test Action Group Prompts
-st.write("## Test Action Group Prompts")
+#st.write("## Test Action Group Prompts")
 
 # Creating a list of prompts for the Action Group section
 action_group_prompts = [
@@ -151,9 +170,9 @@ action_group_prompts = [
 ]
 
 # Displaying the Action Group prompts as a table
-st.table(action_group_prompts)
+#st.table(action_group_prompts)
 
-st.write("## Test KB, AG, History Prompt")
+#st.write("## Test KB, AG, History Prompt")
 
 # Creating a list of prompts for the specific task
 task_prompts = [
@@ -162,4 +181,4 @@ task_prompts = [
 ]
 
 # Displaying the task prompt as a table
-st.table(task_prompts)
+#st.table(task_prompts)

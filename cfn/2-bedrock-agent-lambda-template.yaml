@@ -251,7 +251,6 @@ Resources:
                   "/companyResearch": {
                     "post": {
                       "description": "Get financial data for a company by name",
-                      "operationId": "companyResearch",
                       "parameters": [
                         {
                           "name": "name",
@@ -280,7 +279,6 @@ Resources:
                   "/createPortfolio": {
                     "post": {
                       "description": "Create a company portfolio of top profit earners by specifying number of companies and industry",
-                      "operationId": "createPortfolio",
                       "parameters": [
                         {
                           "name": "numCompanies",
@@ -319,7 +317,6 @@ Resources:
                   "/sendEmail": {
                     "post": {
                       "description": "Send an email with FOMC search summary and created portfolio",
-                      "operationId": "sendEmail",
                       "parameters": [
                         {
                           "name": "emailAddress",
