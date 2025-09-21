@@ -72,7 +72,7 @@ Resources:
           bucket_name = os.environ['BUCKET_NAME']
 
           def handler(event, context):
-              url = "https://github.com/build-on-aws/bedrock-agents-streamlit/archive/refs/heads/main.zip"
+              url = "https://github.com/jboshodi/skanska-bms-streamlit-client/archive/refs/heads/main.zip"
               with tempfile.TemporaryDirectory() as tmpdir:
                   local_zip_path = os.path.join(tmpdir, 'main.zip')
                   
@@ -85,7 +85,7 @@ Resources:
                   with zipfile.ZipFile(local_zip_path, 'r') as zip_ref:
                       zip_ref.extractall(tmpdir)
 
-                  s3docs_path = os.path.join(tmpdir, 'bedrock-agents-streamlit-main', 'S3docs')
+                  s3docs_path = os.path.join(tmpdir, 'skanska-bms-streamlit-client', 'S3docs')
                   for root, dirs, files in os.walk(s3docs_path):
                       for file in files:
                           file_path = os.path.join(root, file)
